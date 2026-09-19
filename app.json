@@ -1,21 +1,20 @@
 {
   "expo": {
-    "name": "Garmy-app",
+    "name": "Garmy",
     "slug": "Garmy-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/garmy.png",
     "scheme": "garmyapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "supportsTablet": true
     },
     "android": {
+      "package": "com.rishit.garmyapp",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#4f5d4e",
+        "foregroundImage": "./assets/images/garmy.png"
       },
       "predictiveBackGestureEnabled": false
     },
@@ -28,15 +27,21 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "backgroundColor": "#4f5d4e",
+          "image": "./assets/images/garmy.png",
+          "imageWidth": 120
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "29dcfffb-29fe-4b30-948b-2cde0031b38b"
+      }
     }
   }
 }
