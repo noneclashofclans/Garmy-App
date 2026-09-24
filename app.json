@@ -8,7 +8,8 @@
     "scheme": "garmyapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rishit.garmyapp"
     },
     "android": {
       "package": "com.rishit.garmyapp",

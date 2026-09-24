@@ -12,6 +12,7 @@ const REVIEWS_API = 'https://garmy-app-reviews-backend.onrender.com';
 
 
 
+
 const StarRow = ({ rating, onRate, size = 22, readOnly = false }) => (
     <View style={{ flexDirection: 'row', gap: 4 }}>
         {[1, 2, 3, 4, 5].map((n) => (
@@ -372,7 +373,7 @@ const styles = StyleSheet.create({
     },
     backButton: {
         marginRight: "auto",
-        marginLeft: 5,
+        marginLeft: 15,
         marginTop: 7,
         marginBottom: 7,
         backgroundColor: "#478e3756",

@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
 
     backButton: {
         marginRight: "auto",
-        marginLeft: 5,
+        marginLeft: 15,
         marginTop: 7,
         marginBottom: 7,
         backgroundColor: "#478e3756",
