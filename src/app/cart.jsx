@@ -57,7 +57,7 @@ const cart = () => {
     const subtotal = calculateSubtotal();
     const shipping = subtotal > 0 && subtotal < 600 ? 15.00 : 0.00;
     const government_taxes = 0.05 * subtotal;
-    const grandTotal = subtotal;
+    const grandTotal = subtotal + shipping + government_taxes;
 
     const handleCheckout = () => {
         if (!user) {

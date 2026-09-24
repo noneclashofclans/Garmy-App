@@ -15,7 +15,7 @@ const dresses = [
         for: "mens",
         category: "formals",
         name: "Classic Navy Charcoal Suit",
-        price: "₹1",
+        price: "₹1099",
         image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=600&q=80"
     },
     {
