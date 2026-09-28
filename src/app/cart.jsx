@@ -31,6 +31,7 @@ const cart = () => {
     const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
     const [addressText, setAddressText] = useState('');
     const [savingAddress, setSavingAddress] = useState(false);
+    const [processingPayment, setProcessingPayment] = useState(false);
 
     useEffect(() => {
         if (user?.email) {
@@ -89,6 +90,12 @@ const cart = () => {
                 })
             });
 
+            if (response.status === 429) {
+                const limited = await response.json().catch(() => ({}));
+                Alert.alert('Slow down', limited.message || 'Too many requests, please wait a moment.');
+                return;
+            }
+
             const data = await response.json();
 
             if (response.ok && data.success) {
@@ -105,18 +112,30 @@ const cart = () => {
     };
 
     const handleSelectPayment = async (type) => {
+        if (processingPayment) return; // ignore double-taps
+
         if (type === 'COD') {
             setIsPaymentModalVisible(false);
             Alert.alert('Success', 'Order placed successfully!');
             router.push('/');
-        } else if (type === 'UPI') {
-            try {
+            return;
+        }
 
+        if (type === 'UPI') {
+            setProcessingPayment(true);
+            try {
                 const response = await fetch(`${ADDRESSES_API}/api/upi_payment/create-order`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount: grandTotal }),
+                    body: JSON.stringify({ amount: grandTotal, email: user.email }),
                 });
+
+                // Rate limit hit
+                if (response.status === 429) {
+                    const limited = await response.json().catch(() => ({}));
+                    Alert.alert('Slow down', limited.message || 'Too many attempts. Try again in a minute.');
+                    return;
+                }
 
                 const data = await response.json();
 
@@ -137,28 +156,26 @@ const cart = () => {
                         contact: user.phone || user.contact || '',
                         name: user.name || 'Garmy Customer',
                     },
-                    theme: { color: '#78a474' }
+                    theme: { color: '#78a474' },
                 };
 
-                RazorpayCheckout.open(options)
-                    .then((paymentData) => {
-                        setIsPaymentModalVisible(false);
-                        Alert.alert(
-                            'Payment Successful!',
-                            `Payment ID: ${paymentData.razorpay_payment_id}`
-                        );
-                        router.push('/');
-                    })
-                    .catch((error) => {
-                        console.log('Razorpay Failure Detail:', error);
-                        Alert.alert(
-                            'Payment Error',
-                            `Please try again after sometime..`
-                        );
-                    });
-
+                try {
+                    const paymentData = await RazorpayCheckout.open(options);
+                    setIsPaymentModalVisible(false);
+                    Alert.alert(
+                        'Payment Successful!',
+                        `Payment ID: ${paymentData.razorpay_payment_id}`
+                    );
+                    router.push('/');
+                } catch (error) {
+                    console.log('Razorpay Failure Detail:', error);
+                    if (error?.code === 0) return; // user closed checkout, no alert needed
+                    Alert.alert('Payment Error', 'Please try again after sometime..');
+                }
             } catch (err) {
                 Alert.alert('Error', 'Unable to process UPI payment right now.');
+            } finally {
+                setProcessingPayment(false);
             }
         }
     };
@@ -305,22 +322,27 @@ const cart = () => {
                         <Text style={styles.modalTitle}>Select Payment Method</Text>
 
                         <TouchableOpacity
-                            style={styles.paymentOption}
+                            style={[styles.paymentOption, processingPayment && styles.disabledOption]}
                             onPress={() => handleSelectPayment('COD')}
+                            disabled={processingPayment}
                         >
                             <Text style={styles.paymentOptionText}>Cash on Delivery (COD)</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            style={styles.paymentOption}
+                            style={[styles.paymentOption, processingPayment && styles.disabledOption]}
                             onPress={() => handleSelectPayment('UPI')}
+                            disabled={processingPayment}
                         >
-                            <Text style={styles.paymentOptionText}>UPI / Online Payment</Text>
+                            <Text style={styles.paymentOptionText}>
+                                {processingPayment ? 'Processing...' : 'UPI / Online Payment'}
+                            </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
                             style={[styles.modalButton, styles.cancelModalButton, { marginTop: 10 }]}
                             onPress={() => setIsPaymentModalVisible(false)}
+                            disabled={processingPayment}
                         >
                             <Text style={styles.cancelButtonText}>Back</Text>
                         </TouchableOpacity>
@@ -573,6 +595,9 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         borderWidth: 1,
         borderColor: '#ffffff22',
+    },
+    disabledOption: {
+        opacity: 0.5,
     },
     paymentOptionText: {
         color: 'white',
