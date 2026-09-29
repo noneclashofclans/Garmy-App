@@ -112,7 +112,7 @@ const cart = () => {
     };
 
     const handleSelectPayment = async (type) => {
-        if (processingPayment) return; // ignore double-taps
+        if (processingPayment) return; 
 
         if (type === 'COD') {
             setIsPaymentModalVisible(false);
@@ -130,7 +130,6 @@ const cart = () => {
                     body: JSON.stringify({ amount: grandTotal, email: user.email }),
                 });
 
-                // Rate limit hit
                 if (response.status === 429) {
                     const limited = await response.json().catch(() => ({}));
                     Alert.alert('Slow down', limited.message || 'Too many attempts. Try again in a minute.');
@@ -169,7 +168,7 @@ const cart = () => {
                     router.push('/');
                 } catch (error) {
                     console.log('Razorpay Failure Detail:', error);
-                    if (error?.code === 0) return; // user closed checkout, no alert needed
+                    if (error?.code === 0) return; 
                     Alert.alert('Payment Error', 'Please try again after sometime..');
                 }
             } catch (err) {
